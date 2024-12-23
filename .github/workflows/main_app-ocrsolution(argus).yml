@@ -1,65 +1,48 @@
-name: Build and deploy Python app to Azure Web App - app-ocrsolution
+name: Build and Deploy to Azure App Service
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    # Step 1: Checkout code
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
+    # Step 2: Set up Python environment (if needed)
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    # Step 3: Install dependencies and build
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
 
-      # بناء وتوليد الملف output.tar.gz
-      - name: Create output.tar.gz
-        run: |
-          tar -czvf output.tar.gz ./src/*  # تعديل المسار حسب الحاجة
+    # Step 4: Create the tar.gz archive (Simulate your existing build process)
+    - name: Create output.tar.gz
+      run: tar -czvf output.tar.gz ./*
 
-      # قم بإنشاء مجلد البناء ونسخ الملفات
-      - name: Package build files
-        run: |
-          mkdir build
-          cp output.tar.gz build/
+    # Step 5: Extract and Deploy to Azure App Service
+    - name: Deploy to Azure App Service
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: app-ocrsolution
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+        package: output.tar.gz
 
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-app
-          path: build/
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'argus'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
-
-      # نشر الملفات إلى Azure Web App باستخدام ZipDeploy
-      - name: Deploy to Azure Web App using ZipDeploy
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'app-ocrsolution'
-          slot-name: 'argus'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+    # Step 6: Extract the build on the App Service
+    - name: Extract Build on App Service
+      run: |
+        curl -X POST \
+        -u ${{ secrets.APP_SERVICE_USERNAME }}:${{ secrets.APP_SERVICE_PASSWORD }} \
+        -d '{"command": "tar -xvzf output.tar.gz -C /home/site/wwwroot"}' \
+        https://app-ocrsolution-argus.scm.azurewebsites.net/api/command
