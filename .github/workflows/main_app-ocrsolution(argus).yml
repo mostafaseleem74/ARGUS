@@ -1,7 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
 name: Build and deploy Python app to Azure Web App - app-ocrsolution
 
 on:
@@ -26,10 +22,10 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
-      
+
       - name: Install dependencies
         run: pip install -r requirements.txt
-        
+
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
       - name: Zip artifact for deployment
@@ -49,7 +45,7 @@ jobs:
     environment:
       name: 'argus'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -57,10 +53,20 @@ jobs:
           name: python-app
 
       - name: Unzip artifact for deployment
-        run: unzip release.zip
+        run: |
+          mkdir extracted
+          unzip release.zip -d extracted
 
-      
-      - name: 'Deploy to Azure Web App'
+      - name: Remove old tar.gz file from /wwwroot/
+        run: |
+          rm -f /wwwroot/output.tar.gz
+
+      - name: Deploy extracted files to Azure Web App
+        run: |
+          # Deploy the extracted files to the Azure Web App
+          az webapp deploy --resource-group <resource-group-name> --name app-ocrsolution --src-path ./extracted --slot argus --type zip
+
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
