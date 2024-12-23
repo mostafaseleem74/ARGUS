@@ -1,7 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
 name: Build and deploy Python app to Azure Web App - app-ocrsolution
 
 on:
@@ -29,19 +25,20 @@ jobs:
       
       - name: Install dependencies
         run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      # Package the application files including output.tar.gz
+      - name: Package build files
+        run: |
+          mkdir build
+          cp -r * build/
+          # Ensure output.tar.gz is included
+          cp output.tar.gz build/
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            release.zip
-            !venv/
+          path: build/
 
   deploy:
     runs-on: ubuntu-latest
@@ -49,21 +46,22 @@ jobs:
     environment:
       name: 'argus'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-
-      
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy build files to Azure Web App
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'app-ocrsolution'
           slot-name: 'argus'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5542411627D04B669CE10FD037C6CB9D }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_44D3935A843D4F808CAE9DCA01EF6EC7 }}
+
+      - name: Extract output.tar.gz on Azure App Service
+        run: |
+          # SSH into Azure App Service and extract the build file
+          az webapp ssh --name app-ocrsolution --resource-group az-euw-rg-ocrsolution-d --command "cd /home/site/wwwroot && tar -xzvf /home/site/wwwroot/output.tar.gz"
