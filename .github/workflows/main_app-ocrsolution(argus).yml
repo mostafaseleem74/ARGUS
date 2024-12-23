@@ -64,7 +64,7 @@ jobs:
       - name: Deploy extracted files to Azure Web App
         run: |
           # Deploy the extracted files to the Azure Web App
-          az webapp deploy --resource-group <resource-group-name> --name app-ocrsolution --src-path ./extracted --slot argus --type zip
+          az webapp deploy --resource-group az-euw-rg-ocrsolution-d --name app-ocrsolution --src-path ./extracted --slot argus --type zip
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
