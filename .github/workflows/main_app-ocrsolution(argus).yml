@@ -30,7 +30,9 @@ jobs:
       - name: Package build files
         run: |
           mkdir build
-          cp -r ./* build/  # Copy all files from the current directory (but not 'build') to the build directory
+          # Exclude the 'build' directory while copying files
+          shopt -s extglob
+          cp -r !(build) build/  # Copy everything except 'build' directory
           # Ensure output.tar.gz is included in the build directory
           cp output.tar.gz build/
 
