@@ -26,20 +26,18 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Package the application files
+      # بناء وتوليد الملف output.tar.gz
+      - name: Create output.tar.gz
+        run: |
+          # هنا يمكن تنفيذ أمر بناء الكود الذي يولد الملف
+          tar -czvf output.tar.gz ./path_to_your_build_files
+
+      # قم بإنشاء مجلد البناء ونسخ الملفات
       - name: Package build files
         run: |
           mkdir build
-          # Exclude the 'build' directory while copying files
-          shopt -s extglob
-          cp -r !(build) build/  # Copy everything except 'build' directory
-          # Check if output.tar.gz exists, and then copy it
-          if [ -f output.tar.gz ]; then
-            cp output.tar.gz build/
-          else
-            echo "output.tar.gz not found. Please check your build process."
-            exit 1
-          fi
+          # نسخ الملفات للمجلد build
+          cp output.tar.gz build/
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
