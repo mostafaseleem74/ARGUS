@@ -42,6 +42,7 @@ jobs:
           path: |
             release.zip
             !venv/
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -65,4 +66,4 @@ jobs:
         with:
           app-name: 'app-ocrsolution'
           slot-name: 'argus'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_44D3935A843D4F808CAE9DCA01EF6EC7 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5542411627D04B669CE10FD037C6CB9D }}
