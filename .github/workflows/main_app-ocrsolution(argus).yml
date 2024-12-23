@@ -30,7 +30,7 @@ jobs:
       - name: Package build files
         run: |
           mkdir build
-          cp -r * build/  # Copy all files from the current directory to the build directory
+          cp -r ./* build/  # Copy all files from the current directory (but not 'build') to the build directory
           # Ensure output.tar.gz is included in the build directory
           cp output.tar.gz build/
 
