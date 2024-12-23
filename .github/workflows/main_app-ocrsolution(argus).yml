@@ -62,15 +62,10 @@ jobs:
         with:
           name: python-app
 
-      - name: Deploy build files to Azure Web App
+      - name: Deploy to Azure Web App using ZipDeploy
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
           app-name: 'app-ocrsolution'
           slot-name: 'argus'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_44D3935A843D4F808CAE9DCA01EF6EC7 }}
-
-      - name: Extract output.tar.gz on Azure App Service
-        run: |
-          # SSH into Azure App Service and extract the build file
-          az webapp ssh --name app-ocrsolution --resource-group az-euw-rg-ocrsolution-d --command "cd /home/site/wwwroot && tar -xzvf /home/site/wwwroot/output.tar.gz"
+          publish-profile: ${{ secrets.AZURE_WEBAPP_USERNAME }}
+          password: ${{ secrets.AZURE_WEBAPP_PASSWORD }}
