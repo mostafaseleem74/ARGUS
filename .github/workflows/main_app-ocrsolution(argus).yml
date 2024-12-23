@@ -26,15 +26,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # عرض الملفات في المجلد الحالي للتأكد من وجود الملفات المطلوبة
+      - name: List files in the current directory
+        run: ls -alh
+
       # بناء وتوليد الملف output.tar.gz
       - name: Create output.tar.gz
         run: |
-          tar -czvf output.tar.gz ./src/*  # تعديل المسار حسب الحاجة
+          # تعديل المسار حسب المكان الذي يحتوي على الملفات التي تريد ضغطها
+          tar -czvf output.tar.gz ./src/*  # قم بتغيير المسار هنا حسب الحاجة
 
       # قم بإنشاء مجلد البناء ونسخ الملفات
       - name: Package build files
         run: |
           mkdir build
+          # نسخ الملفات للمجلد build
           cp output.tar.gz build/
 
       - name: Upload artifact for deployment jobs
@@ -56,16 +62,15 @@ jobs:
         with:
           name: python-app
 
-      # تسجيل الدخول إلى Azure
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # نشر الملفات إلى Azure Web App باستخدام ZipDeploy
-      - name: Deploy to Azure Web App using ZipDeploy
-        uses: azure/webapps-deploy@v3
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v4
+        id: deploy-to-webapp
         with:
           app-name: 'app-ocrsolution'
           slot-name: 'argus'
-          publish-profile: ${{ secrets.argus }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+      - name: Extract output.tar.gz on Azure App Service
+        run: |
+          # SSH into Azure App Service and extract the build file
+          az webapp ssh --name app-ocrsolution --resource-group az-euw-rg-ocrsolution-d --command "cd /home/site/wwwroot && tar -xzvf /home/site/wwwroot/output.tar.gz"
