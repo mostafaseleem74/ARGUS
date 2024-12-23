@@ -66,5 +66,3 @@ jobs:
           app-name: 'app-ocrsolution'
           slot-name: 'argus'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_44D3935A843D4F808CAE9DCA01EF6EC7 }}
-
-this is workflow ?
