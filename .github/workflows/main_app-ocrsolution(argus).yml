@@ -56,12 +56,6 @@ jobs:
         with:
           name: python-app
 
-      # تسجيل الدخول إلى Azure
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       # نشر الملفات إلى Azure Web App باستخدام ZipDeploy
       - name: Deploy to Azure Web App using ZipDeploy
         uses: azure/webapps-deploy@v3
