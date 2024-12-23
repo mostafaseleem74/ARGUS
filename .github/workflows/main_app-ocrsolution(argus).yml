@@ -30,8 +30,8 @@ jobs:
       - name: Package build files
         run: |
           mkdir build
-          cp -r * build/
-          # Ensure output.tar.gz is included
+          cp -r * build/  # Copy all files from the current directory to the build directory
+          # Ensure output.tar.gz is included in the build directory
           cp output.tar.gz build/
 
       - name: Upload artifact for deployment jobs
