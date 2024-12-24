@@ -1,17 +1,17 @@
-name: Build and deploy Python app to Azure Web App - argus
+name: Build and Deploy Flask App to Azure App Service
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main  # Trigger on pushes to the main branch
+  workflow_dispatch:  # Allow manual trigger of the workflow
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the code
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.9'  # Ensure it matches your app's runtime
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -27,8 +27,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Step 4: Deploy directly to Azure
-      - name: Deploy to Azure Web App
+      # Step 4: Deploy to Azure App Service
+      - name: Deploy to Azure
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'app-ocrsolution'
